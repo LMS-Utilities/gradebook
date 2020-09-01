@@ -5,13 +5,13 @@ from pathlib import Path
 from typing import Pattern
 
 student_list = [
-    
+
 ]
 
-old_dir: Path = Path("1/")
-new_dir: Path = Path("2/")
+old_dir: Path = Path("gradebook_raw/")
+new_dir: Path = Path("gradebook/")
 new_dir.mkdir(exist_ok=True)
-pattern: Pattern = re.compile("_(.*)_attempt_")
+pattern: Pattern = re.compile("_(n[0-9]+)_attempt_")
 
 def copytree(src, dst, symlinks=False, ignore=None):
     for item in os.listdir(src):
@@ -39,23 +39,31 @@ def main():
             print(f"does not match regex: {item}")
             continue
 
+        print(id_)
+
         if student_list != [] and id_ not in student_list:
             continue
 
-        student_dir = Path(new_dir, id_)
-        if not student_dir.exists():
-            student_dir.mkdir()
+        new_item = Path(new_dir, f"{id_}").with_suffix(item.suffix)
+        print(new_item)
 
-        # copy root files to student dir
-        if item.is_file():
-            new_item = Path(student_dir, f"root_{id_}").with_suffix(item.suffix)
-            move_formatter(item, new_item)
-            shutil.copy(str(item), str(new_item))
+        shutil.copy(item, new_item)
 
-        # copy files in dirs to student dir 
-        if item.is_dir():
-            move_formatter(item, student_dir)
-            copytree(str(item), str(student_dir))
+
+        # student_dir = Path(new_dir, id_)
+        # if not student_dir.exists():
+            # student_dir.mkdir()
+
+        # # copy root files to student dir
+        # if item.is_file():
+        #     new_item = Path(student_dir, f"root_{id_}").with_suffix(item.suffix)
+        #     move_formatter(item, new_item)
+        #     shutil.copy(str(item), str(new_item))
+
+        # # copy files in dirs to student dir 
+        # if item.is_dir():
+        #     move_formatter(item, student_dir)
+        #     copytree(str(item), str(student_dir))
         
 if __name__ == "__main__":
     main()
